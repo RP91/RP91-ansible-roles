@@ -1,0 +1,44 @@
+---
+# tasks file for webserver
+- name: install various dependencies
+  yum:
+    name: "{{ item }}"
+    state: latest
+  loop:
+    - mariadb
+    - mariadb-server
+    - MySQL-python
+  notify:
+    - restart mysql
+- name: start mariadb
+  service:
+    name: mariadb
+    enabled: yes
+- name: create db
+  mysql_db:
+    name: newone
+    state: present
+    login_user: root
+    login_password: "{{ mysql_root_password }}"
+  tags:
+    - skips
+- name: dump all databases
+  mysql_db:
+    name: all
+    state: dump
+    target: /home/cloud_user/databases_cloud_user.sql
+    login_user: root
+    login_password: "{{ mysql_root_password }}" 
+  tags:
+    - skips
+- name: create new mysql user
+  mysql_user:
+    name: john
+    state: present
+    priv: "*.*:ALL"
+    password: "{{ mysql_john_password }}"
+    login_user: root
+    login_password: "{{ mysql_root_password }}" 
+  tags:
+    - skips
+

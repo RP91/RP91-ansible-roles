@@ -1,0 +1,45 @@
+---
+# tasks file for webserver
+- name: upgrade yum packages to latest
+  yum:
+    name: '*'
+    state: latest
+- name: ensure nginx is not installed
+  yum:
+    name: nginx
+    state: absent
+- name: install various dependencies
+  yum:
+    name: "{{ item }}"
+    state: latest
+  loop:
+    - epel-release
+    - bash-completion
+    - httpd
+    - vim
+    - wget
+    - curl
+    - lynx
+    - tree
+  notify:
+    - restart httpd
+- name: start httpd
+  service:
+    name: httpd
+    enabled: yes
+- name:
+  file:
+    name: /var/www
+    state: directory
+    owner: apache
+    group: apache
+    mode: 0755
+    recurse: yes
+- name: copy website
+  copy:
+    src: index.html
+    dest: /var/www/html/
+    owner: apache
+    group: apache
+    mode: 0664
+

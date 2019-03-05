@@ -1,0 +1,9 @@
+---
+- hosts: playground
+  connection: ssh
+  become: yes
+  become_method: sudo
+  gather_facts: yes
+  roles:
+    - webserver
+    - dbserver
